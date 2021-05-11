@@ -15,9 +15,14 @@ import (
 var (
 	app = kingpin.New("opslevel", "OpsLevel.com command line utility")
 
-	serviceCmd    = app.Command("service", "")
-	serviceGetCmd = serviceCmd.Command("get", "get a service by name / alias")
-	serviceAlias  = serviceGetCmd.Arg("alias", "service alias").Required().String()
+	serviceCmd            = app.Command("service", "")
+	serviceGetCmd         = serviceCmd.Command("get", "get a service by name / alias")
+	serviceGetCmdAliasArg = serviceGetCmd.Arg("alias", "service alias").Required().String()
+
+	serviceTagCmd            = serviceCmd.Command("tag", "manipulate service tags")
+	serviceTagAddCmd         = serviceTagCmd.Command("add", "Add service tag")
+	serviceTagAddCmdAliasArg = serviceTagAddCmd.Arg("alias", "service alias").Required().String()
+	serviceTagAddCmdTagsArg  = serviceTagAddCmd.Arg("k=v", "key=value tag").Required().StringMap()
 
 	teamCmd    = app.Command("team", "")
 	teamGetCmd = teamCmd.Command("get", "get a team by name / alias")
@@ -36,8 +41,17 @@ func main() {
 	client := opslevel.NewClient(authToken)
 
 	switch cmd {
+	case serviceTagAddCmd.FullCommand():
+		for key, value := range *serviceTagAddCmdTagsArg {
+			tag, err := client.CreateTag(context.Background(), key, value, *serviceTagAddCmdAliasArg, "Service")
+			if err != nil {
+				log.Fatalln(err)
+			}
+			pretty.Println(tag)
+		}
+
 	case serviceGetCmd.FullCommand():
-		svc, err := client.GetService(context.Background(), *serviceAlias)
+		svc, err := client.GetService(context.Background(), *serviceGetCmdAliasArg)
 		if err != nil {
 			log.Fatalln(err)
 		}
