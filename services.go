@@ -67,7 +67,7 @@ func (c *Client) GetServiceByAlias(ctx context.Context, alias string) (*Service,
 
 func (c *Client) getService(ctx context.Context, query string, params map[string]interface{}) (*Service, error) {
 	var res serviceResponse
-	if err := c.Do(ctx, serviceQuery, params, &res); err != nil {
+	if err := c.Do(ctx, query, params, &res); err != nil {
 		return nil, fmt.Errorf("could not find service: %w", err)
 	}
 	if res.Account.Service == nil {
@@ -154,7 +154,7 @@ query($serviceAlias: String) {
 `
 
 const serviceQueryById = `
-query($serviceAlias: String) {
+query($serviceId: ID) {
   account {
     service(id: $serviceId){
       id

@@ -21,8 +21,9 @@ var (
 	serviceCreateCmd        = serviceCmd.Command("create", "create a service in OpsLevel")
 	serviceCreateCmdNameArg = serviceCreateCmd.Arg("name", "service name").Required().String()
 	// Get Service
-	serviceGetCmd         = serviceCmd.Command("get", "get a service by name / alias")
-	serviceGetCmdAliasArg = serviceGetCmd.Arg("alias", "service alias").Required().String()
+	serviceGetCmd          = serviceCmd.Command("get", "get a service by name / alias")
+	serviceGetCmdIdFlag    = serviceGetCmd.Flag("id", "Id of service to get").String()
+	serviceGetCmdAliasFlag = serviceGetCmd.Flag("alias", "Alias of service to get").String()
 	// Tag Service
 	serviceTagCmd            = serviceCmd.Command("tag", "manipulate service tags")
 	serviceTagAddCmd         = serviceTagCmd.Command("add", "Add service tag")
@@ -89,7 +90,16 @@ func main() {
 		}
 
 	case serviceGetCmd.FullCommand():
-		svc, err := client.GetServiceByAlias(context.Background(), *serviceGetCmdAliasArg)
+		var svc *opslevel.Service
+		var err error
+		if serviceGetCmdIdFlag != nil && *serviceGetCmdIdFlag != "" {
+			svc, err = client.GetServiceById(context.Background(), *serviceGetCmdIdFlag)
+		} else if serviceGetCmdAliasFlag != nil && *serviceGetCmdAliasFlag != "" {
+			svc, err = client.GetServiceByAlias(context.Background(), *serviceGetCmdAliasFlag)
+		} else {
+			app.FatalUsage("--alias or --id flag must be provided")
+		}
+
 		if err != nil {
 			log.Fatalln(err)
 		}
