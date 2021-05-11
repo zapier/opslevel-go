@@ -3,6 +3,7 @@ package opslevel
 import (
 	"context"
 	"fmt"
+
 	"github.com/machinebox/graphql"
 )
 
@@ -52,7 +53,7 @@ func handleGraphqlErrs(errs []graphqlError) error {
 	for _, err := range errs {
 		errMsg += fmt.Sprintf("%s path: %s", err.Message, err.Path)
 	}
-	return fmt.Errorf("could not create tag: %s", errMsg)
+	return fmt.Errorf("graphql error: %s", errMsg)
 }
 
 type graphqlError struct {
