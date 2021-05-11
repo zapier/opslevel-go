@@ -55,17 +55,17 @@ func (c *Client) GetServiceById(ctx context.Context, id string) (*Service, error
 	params := map[string]interface{}{
 		"serviceId": id,
 	}
-	return c.GetService(ctx, serviceQueryById, params)
+	return c.getService(ctx, serviceQueryById, params)
 }
 
 func (c *Client) GetServiceByAlias(ctx context.Context, alias string) (*Service, error) {
 	params := map[string]interface{}{
 		"serviceAlias": alias,
 	}
-	return c.GetService(ctx, serviceQuery, params)
+	return c.getService(ctx, serviceQuery, params)
 }
 
-func (c *Client) GetService(ctx context.Context, query string, params map[string]interface{}) (*Service, error) {
+func (c *Client) getService(ctx context.Context, query string, params map[string]interface{}) (*Service, error) {
 	var res serviceResponse
 	if err := c.Do(ctx, serviceQuery, params, &res); err != nil {
 		return nil, fmt.Errorf("could not find service: %w", err)
@@ -83,7 +83,7 @@ func (c *Client) DeleteServiceByAlias(ctx context.Context, alias string) (*Delet
 	params := map[string]interface{}{
 		"input": args,
 	}
-	res, err := c.DeleteService(ctx, serviceDeleteMutation, params)
+	res, err := c.deleteService(ctx, serviceDeleteMutation, params)
 	return res, err
 }
 
@@ -94,11 +94,11 @@ func (c *Client) DeleteServiceById(ctx context.Context, id string) (*DeleteServi
 	params := map[string]interface{}{
 		"input": args,
 	}
-	res, err := c.DeleteService(ctx, serviceDeleteMutation, params)
+	res, err := c.deleteService(ctx, serviceDeleteMutation, params)
 	return res, err
 }
 
-func (c *Client) DeleteService(ctx context.Context, query string, params map[string]interface{}) (*DeleteServiceResponse, error) {
+func (c *Client) deleteService(ctx context.Context, query string, params map[string]interface{}) (*DeleteServiceResponse, error) {
 	var res DeleteServiceResponse
 	if err := c.Do(ctx, query, params, &res); err != nil {
 		return nil, err
